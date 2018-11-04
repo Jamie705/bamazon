@@ -1,0 +1,2 @@
+# bamazon
+Mock Amazon CLI
