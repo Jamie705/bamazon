@@ -1,14 +1,18 @@
 # Bamazon
-There are two options to run bamazonCustomer.js and bamazonManager.js.
+There are two apps to choose from Customer and Manager.
 
 ### Bamazon Customer
-This appication is a small amazon mock CLI. The application will first display all of the items available for sale. Include the ids, names, and prices of products for sale. Then request item id, and quantity to place order.
+This appication is a small amazon mock CLI. The application will first display all of the items available for sale. Include the ids, names, and prices of products for sale. Then request item id, and quantity to place order. Use bamazonCustomer.js to run this app.
+View link to see it action:
+https://drive.google.com/file/d/1j4z5vk9-x5rnVIiVtmF18WWrL8P5GvuI/view
 
 ### Bamazon Manager
-This application provides manager options View Products for Sale, View Low Inventory, Add to Inventory and Add New Product.
+This application provides manager overview the options available are View Products for Sale, View Low Inventory, Add to Inventory and Add New Product. Use bamazonManager.js to run this app.
+View this link in action:
+https://drive.google.com/file/d/1JxSWOZBq7vQ6hcSJ1EDA2nV9rUbyj7vO/view
 
 ## How to use bamazonCustomer.js
-The app will prompt user to select ID of the product they would like to buy, next message will ask how many units of the product they would like to buy.
+The app will prompt user to enter ID of the product they would like to buy, next message will ask how many units of the product they would like to buy.
 
 The application will check if your store has enough of the product to meet the request.
 
@@ -19,7 +23,7 @@ The application will check if your store has enough of the product to meet the r
 The database will update as items are sold.
 
 ## How to use BamazonManager.js
-The app will promt options available. Select from one of the options:
+The app will prompt options available. Select from one of the options:
 
 * `View Products for Sale`, will list every available item: the item IDs, Names, Prices, and Quantities.
 

@@ -112,7 +112,7 @@ function lowQuantity() {
             }
             console.log(
                 "\n**************************************************************\n",
-                "    All other products have an inventory of 5 or greater.",
+                "All other products have an inventory of 5 or greater",
                 "\n**************************************************************\n",
                 );
             continueManage();         
@@ -262,13 +262,13 @@ function addProduct() {
                 function (err, res) {
                     console.log(res.affectedRows + 
                         "\n-----------------------------------------------------------\n",
-                        newItem + " in" + departmentName + " has been added!",
+                        newItem + " in " + departmentName + " has been added!",
                         "\n-----------------------------------------------------------\n"
                     );
                 }
             )
+            setTimeout(continueManage, 500)
         });
-    continueManage();
 }
 
 //function to ask if they want to continue to manage
