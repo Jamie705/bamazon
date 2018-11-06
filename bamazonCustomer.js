@@ -25,8 +25,7 @@ connection.connect (function (err) {
 
     console.log("connected as id " + connection.threadId);
     showProducts();
-    
-    chooseId();
+    setTimeout(chooseId, 300);
 });
 
 // function to query and show products available
@@ -37,18 +36,18 @@ function showProducts() {
             console.log(
                 "Id: " +
                 res[i].id +
-                " || Product Name: " +
+                " || Product: " +
                 res[i].product_name +
                 " || Price: " +
                 res[i].price +
-                "\n================================================================="
+                "\n------------------------------------------------------------",
             );
         }
     // connection.end();
     });
 }
 
-//funtion to show/check quantity available for all products
+//funtion to show/check quantity available for all products. ==Did not use==
 function showQuantity() {
     connection.query("SELECT id, quantity FROM products", function (err, res) {
         if (err) throw err;
@@ -89,89 +88,103 @@ function orderMore() {
 var price;
 // //function to choose id 
 function chooseId() {
-    // prompt for id choice 
-    inquirer
-        .prompt([
-            {
-                name: "id",
-                type: "input",
-                message: "What is the ID number of the product you would like to purchase?",
-            },
-            {
-                name: "quantity",
-                type: "input",
-                message: "How many would you like order?",
-                validate: function (value) {
-                    if (isNaN(value) === false) {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-        ])
-        .then(function (answer) {
-            //save answer into variable to check id against qty
-            var chosenId = answer.id;
-            
-            //save answer into variable to save qty
-            var chosenQuantity= answer.quantity;
-
-            //query to check available quantity
-            var query ="SELECT quantity FROM products WHERE id=?"
-            connection.query(query, chosenId, function (err, res) {
-                if (err) throw err;
-                var qtyAvailable = res[0].quantity   
-                //testing for qty,
-                    // console.log(
-                    //     "Id: " +
-                    //     chosenId +
-                    //     " || Quantity Available : " +
-                    //     qtyAvailable
-                    // );
-                  
-                // check chosen id against available qty and assign variable
-                var newQuantity = (qtyAvailable-chosenQuantity);
-                // console.log(newQuantity);
-                //if quantity is available place order else start over
-                if (chosenQuantity < qtyAvailable) {
-                    connection.query(
-                        "UPDATE products SET ? WHERE ?",
-                        [
-                            {
-                                quantity: newQuantity
-                            },
-                            { 
-                                id: answer.id
-                            }
-                        ],
-                        function (err) {
-                            if (err) throw err;
-                            //query for price
-                            var priceQuery = "SELECT price FROM products WHERE id=?"
-                            connection.query(priceQuery, chosenId, function (err, res) {
-                                if (err) throw err;
-                                
-                                else if (price != null){
-                                    price += res[0].price * chosenQuantity;
-                                }
-                                else{
-                                //store variable to display price
-                                price = res[0].price * chosenQuantity
-                                }
-
-                            console.log("Your order has been placed successfully. Your total cost is: " + price);
-                            });
-                            // re-prompt the user for if they want to placce another order
-                            orderMore();
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        idArr=[];
+        for (let i = 0; i < res.length; i++) {
+            idArr.push(res[i].id)
+        }
+        // prompt for id choice 
+        inquirer
+            .prompt([
+                {
+                    name: "id",
+                    type: "input",
+                    message: "What is the ID number of the product you would like to purchase?",
+                },
+                {
+                    name: "quantity",
+                    type: "input",
+                    message: "How many would you like order?",
+                    validate: function (value) {
+                        if (isNaN(value) === false) {
+                            return true;
                         }
-                    );
+                        return false;
+                    }
+                }
+            ])
+            .then(function (answer) {
+                //save answer into variable to check id against qty
+                var chosenId = answer.id;
+                //save answer into variable to save qty
+                var chosenQuantity= answer.quantity;
+
+                if (idArr.indexOf(parseInt(chosenId)) === -1) {
+                    console.log("Sorry " + chosenId + " is not a valid ID#. Please try again.");
+                        chooseId(); 
                 }
                 else {
-                    //Quantity was not available, so apologize and start over
-                    console.log("We do not have enough quantity of that product. Please try again...");
-                    showProducts();
-                    chooseId();
+                    console.log("Great choice. Checking inventory .....");
+                    
+                    //query to check available quantity
+                    var query = "SELECT quantity FROM products WHERE id=?"
+                    connection.query(query, chosenId, function (err, res) {
+                        if (err) throw err;
+
+                        var qtyAvailable = res[0].quantity
+                        // check chosen id against available qty and assign variable
+                        var newQuantity = (qtyAvailable - chosenQuantity);
+                        // console.log(newQuantity);
+                        //if quantity is available place order else start over
+                        if (chosenQuantity < qtyAvailable) {
+                            connection.query(
+                                "UPDATE products SET ? WHERE ?",
+                                [
+                                    {
+                                        quantity: newQuantity
+                                    },
+                                    {
+                                        id: answer.id
+                                    }
+                                ],
+                                function (err) {
+                                    if (err) throw err;
+
+                                    //query for price
+                                    var priceQuery = "SELECT price FROM products WHERE id=?"
+                                    connection.query(priceQuery, chosenId, function (err, res) {
+                                        if (err) throw err;
+
+                                        else if (price != null) {
+                                            price += res[0].price * chosenQuantity;
+                                        }
+                                        else {
+                                            //store variable to display price
+                                            price = res[0].price * chosenQuantity
+                                        }
+                                        console.log(
+                                            "\n==========================================================================",
+                                            "\nYour order has been placed successfully. Your total cost is: $" + price +
+                                            "\n=========================================================================="
+                                        );
+
+                                        // re-prompt the user for if they want to placce another order
+                                        orderMore();
+                                    });
+                                }
+                            );
+                        }
+                        else {
+                            //Quantity was not available, so apologize and start over
+                            console.log("We do not have enough quantity of that product. Please try again...");
+                            setTimeout(chooseId, 300);
+                        }
+                    });
+
+                    
                 }
-        });  
-    }); 
+                   
+        });          
+    });
 }

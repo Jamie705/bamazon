@@ -1,5 +1,4 @@
 # Bamazon
-
 There are two options to run bamazonCustomer.js and bamazonManager.js.
 
 ### Bamazon Customer
@@ -13,22 +12,24 @@ The app will prompt user to select ID of the product they would like to buy, nex
 
 The application will check if your store has enough of the product to meet the request.
 
-* If item is not available, the app should show message of item quantity not being available.
+* If item is not available, the app will show message of item quantity not being available.
 
-* If enough of the product is available, order will be fulfulled and a message will display to confirm orde was placed and total for the order.
+* If enough of the product is available, order will be fulfulled and a message will display to confirm order was placed, and total for the order.
 
 The database will update as items are sold.
 
 ## How to use BamazonManager.js
-The app will promt options available. Select one of the options:
+The app will promt options available. Select from one of the options:
 
-* `View Products for Sale` the app will list every available item: the item IDs, Names, Prices, and Quantities.
+* `View Products for Sale`, will list every available item: the item IDs, Names, Prices, and Quantities.
 
 * `View Low Inventory`, will list all items with an inventory count lower than five.
 
 * `Add to Inventory`, will display a prompt that will let the manager "add more" of any item currently in the store.
 
 * `Add New Product`, will allow the manager to add a completely new product to the store.
+
+* `Exit Menu`, will allow the manager to exit the menu.
 
 ## Technologies Used
 * JavaScript

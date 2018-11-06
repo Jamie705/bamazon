@@ -27,8 +27,7 @@ connection.connect(function (err) {
     managerOptions();
 });
 
-
-// //function to choose options available to manage
+//function to choose options available to manage
 function managerOptions() {
     // prompt for options available 
     inquirer
@@ -42,6 +41,7 @@ function managerOptions() {
                     "View Low Inventory",
                     "Add to Inventory",
                     "Add New Product",
+                    "Exit Menu"
                 ]
             }
         )
@@ -62,11 +62,14 @@ function managerOptions() {
                 case "Add New Product":
                     addProduct();
                     break;
+                case "Exit Menu":
+                    exitMenu();
+                    break;
             }
         });
 }
 
-// function to query and show all products available
+//function to query and show all products available
 function viewProducts() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -74,17 +77,17 @@ function viewProducts() {
             console.log(
                 "Id: " +
                 res[i].id +
-                " || Product Name: " +
+                " || Product: " +
                 res[i].product_name +
                 " || Price: " +
                 res[i].price +
                 " || Quantity: " +
                 res[i].quantity +
-                "\n================================================================================"
+                "\n----------------------------------------------------------------------------"
             );
         }
+        continueManage();
     });
-    continueManage();
 }
 
 //funtion to show/check low quantity for all products
@@ -96,48 +99,62 @@ function lowQuantity() {
                 //else if statement to show if product is under 5 qty
                 if (res[j].quantity <= 5){
                     console.log( 
-                        "\n*************** Warning: Inventoy is low!! ***************\n",
+                        "\n*************** !! Warning: Inventoy is low !! ***************\n",
                         "Id: " +
                         res[j].id +
-                        " || Product Name: " +
+                        " || Product: " +
                         res[j].product_name +
                         " || Quantity: " +
                         res[j].quantity +
-                        "\n**********************************************************",
+                        "\n**************************************************************\n",
                     )
                 }     
-                else {
-                    console.log(
-                        "\n************************* Inventoy is Good *************************\n"
-                        + productName + " has inventory of 5 or greater in quantity",
-                        "\n********************************************************************",
-                    );
-                } 
-            }           
+            }
+            console.log(
+                "\n------------------------- Inventoy is Good --------------------------",
+                "\nAll other products have inventory of 5 or greater in quantity",
+                "\n---------------------------------------------------------------------"
+                );
+            continueManage();         
     });
-    continueManage();
 }
 
 //function to update inventory
 function addInventory() {                
-    console.log("Update inventory...\n");
+    // console.log("Update inventory...\n");
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            console.log(
+                "Id: " +
+                res[i].id +
+                " || Product: " +
+                res[i].product_name +
+                 " || Quantity: " +
+                res[i].quantity +
+                "\n------------------------------------------------------------",
+            );
+        }
+        // ask for prouct and add qty
         inquirer
             .prompt([
                 {
-                    name: "productID",
-                    type: "input",
-                    message: "Enter the ID of the product you want to update: ",
-                    validate: function (value) {
-                        if (isNaN(value) === false) {
-                            return true;
+                    name: "product",
+                    type: "list",
+                    message: "Select the product you want to update: ",
+                    choices: function () {
+                        var productArr = [];
+                        for (let j = 0; j < res.length; j++) {
+                            productArr.push(res[j].product_name);
                         }
-                        return false;
-                    }
+                        return productArr;
+                    },
+                    
                 },
                 {
                     name: "quantity",
                     type: "input",
-                    message: "Enter the new quantity: ",
+                    message: "Enter the quantity you wish to add: ",
                     validate: function (value) {
                         if (isNaN(value) === false) {
                             return true;
@@ -146,26 +163,41 @@ function addInventory() {
                     }
                 },
             ])
-
+    
             .then(function (answer) {
-                idUpdate = answer.productID;
+                product = answer.product;
                 quantity = answer.quantity;
 
-                connection.query(
-                    "UPDATE products SET ? WHERE ?", 
-                    [
-                        {
-                            quantity: quantity,
-                        },
-                        {
-                            id: idUpdate,  
-                        }
-                    ],
-                function (err, res) {
-                    console.log("Id: " + idUpdate + " quantity has been updated to" + quantity);
-                })
-                continueManage(); 
-            }); 
+                var queryQuantity = "SELECT quantity FROM products WHERE product_name=?"
+                
+                connection.query(queryQuantity, product, function (err, res) {
+                    if (err) throw err;
+                    var currentQuantity = res[0].quantity
+                    
+                    // check  current quantity and add to inventory
+                    var newQuantity = parseInt(currentQuantity) + parseInt(quantity);
+                    //new query to add quantity to product
+                    connection.query("UPDATE products SET ? WHERE ?",                
+                        [
+                            {
+                                quantity: newQuantity,
+                            },
+                            {
+                                product_name: product,  
+                            }
+                        ],
+                    function (err, res) {
+                        console.log(
+                            "\n---------------------------------------------------------------------",
+                            "\nId: " + product + " quantity has been updated to: " + newQuantity +
+                            "\n----------------------------------------------------------------------"
+                            );
+                        continueManage();
+                    });
+                         
+                });
+            });    
+    });        
 }
 
 //function to add a new product
@@ -228,12 +260,14 @@ function addProduct() {
                 },
 
                 function (err, res) {
-                    console.log(res.affectedRows + " Product Added!\n");
-                    // Call updateProduct AFTER the INSERT completes
-                    // updateProduct();
+                    console.log(res.affectedRows + 
+                        "\n------------------------------------",
+                        "\nNew product has been added!" +
+                        "\n------------------------------------"
+                    );
                 }
             )
-            continueManage();
+        continueManage();
         });
 }
 
@@ -258,4 +292,9 @@ function continueManage() {
                 connection.end();
             }
         });
+}
+//function to exit menu
+function exitMenu() {
+    console.log("Thank you! Goodbye.")
+    connection.end();
 }
