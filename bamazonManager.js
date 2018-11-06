@@ -111,9 +111,9 @@ function lowQuantity() {
                 }     
             }
             console.log(
-                "\n------------------------- Inventoy is Good --------------------------",
-                "\nAll other products have inventory of 5 or greater in quantity",
-                "\n---------------------------------------------------------------------"
+                "\n**************************************************************\n",
+                "    All other products have an inventory of 5 or greater.",
+                "\n**************************************************************\n",
                 );
             continueManage();         
     });
@@ -261,14 +261,14 @@ function addProduct() {
 
                 function (err, res) {
                     console.log(res.affectedRows + 
-                        "\n------------------------------------",
-                        "\nNew product has been added!" +
-                        "\n------------------------------------"
+                        "\n-----------------------------------------------------------\n",
+                        newItem + " in" + departmentName + " has been added!",
+                        "\n-----------------------------------------------------------\n"
                     );
                 }
             )
-        continueManage();
         });
+    continueManage();
 }
 
 //function to ask if they want to continue to manage

@@ -77,7 +77,7 @@ function orderMore() {
         .then(function (answer) {
             if (answer.confirm){
                 showProducts();
-                chooseId();
+                setTimeout(chooseId, 300);
             }
             else{
                 console.log("Thanks for visiting! Goodbye.")
@@ -166,7 +166,7 @@ function chooseId() {
                                         console.log(
                                             "\n==========================================================================",
                                             "\nYour order has been placed successfully. Your total cost is: $" + price +
-                                            "\n=========================================================================="
+                                            "\n==========================================================================\n"
                                         );
 
                                         // re-prompt the user for if they want to placce another order
@@ -177,7 +177,7 @@ function chooseId() {
                         }
                         else {
                             //Quantity was not available, so apologize and start over
-                            console.log("We do not have enough quantity of that product. Please try again...");
+                            console.log("Sorry, the quantity requested for this product is not available. Please try again....\n");
                             setTimeout(chooseId, 300);
                         }
                     });
